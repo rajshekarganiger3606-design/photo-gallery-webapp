@@ -4,6 +4,7 @@
 <html>
 <head>
     <title>Photo Gallery</title>
+    <!-- version 1.1 - auto-db -->
     <style>
         body {
             font-family: Arial, sans-serif;
