@@ -28,6 +28,7 @@
         <filter-name>AdminAuthFilter</filter-name>
         <url-pattern>/upload</url-pattern>
         <url-pattern>/admin/upload</url-pattern>
+        <url-pattern>/admin/delete</url-pattern>
     </filter-mapping>
 
     <servlet>
@@ -64,6 +65,15 @@
     <servlet-mapping>
         <servlet-name>AdminUploadServlet</servlet-name>
         <url-pattern>/admin/upload</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>DeleteServlet</servlet-name>
+        <servlet-class>com.photogallery.servlet.DeleteServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DeleteServlet</servlet-name>
+        <url-pattern>/admin/delete</url-pattern>
     </servlet-mapping>
 
     <servlet>

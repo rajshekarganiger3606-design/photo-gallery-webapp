@@ -74,4 +74,15 @@ public class PhotoDAO {
 
         return photo;
     }
+
+    public void deletePhoto(int id) throws SQLException {
+        String sql = "DELETE FROM photos WHERE id = ?";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+        }
+    }
 }

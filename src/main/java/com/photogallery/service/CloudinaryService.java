@@ -59,4 +59,34 @@ public class CloudinaryService {
         return baseName.replaceAll("[^a-zA-Z0-9_-]", "_")
                 + "-" + System.currentTimeMillis();
     }
+
+    public void deleteImage(String imageUrl) throws IOException {
+        if (imageUrl == null || !imageUrl.contains("res.cloudinary.com")) {
+            return;
+        }
+
+        String key = "/image/upload/";
+        int index = imageUrl.indexOf(key);
+        if (index == -1) {
+            return;
+        }
+
+        // Extract path after /image/upload/
+        String path = imageUrl.substring(index + key.length());
+
+        // Strip the version segment (e.g., v123456789/) if present
+        if (path.contains("/")) {
+            String firstSegment = path.substring(0, path.indexOf('/'));
+            if (firstSegment.matches("v\\d+")) {
+                path = path.substring(path.indexOf('/') + 1);
+            }
+        }
+
+        // Strip extension to get public_id
+        int lastDot = path.lastIndexOf('.');
+        String publicId = lastDot == -1 ? path : path.substring(0, lastDot);
+
+        // Delete from Cloudinary
+        cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+    }
 }
