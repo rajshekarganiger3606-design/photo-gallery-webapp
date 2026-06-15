@@ -37,12 +37,14 @@ public class DatabaseInitializer implements ServletContextListener {
         verifyConnection();
     }
 
-    private void createDatabaseIfNeeded() throws SQLException {
+    private void createDatabaseIfNeeded() {
         String baseUrl = AppConfig.getBaseDbUrl();
-
         try (Connection conn = DatabaseConfig.getConnection(baseUrl);
              Statement stmt = conn.createStatement()) {
             stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS photo_gallery");
+            System.out.println("[PhotoGallery] Created database photo_gallery if it did not exist.");
+        } catch (SQLException e) {
+            System.out.println("[PhotoGallery] Skip database creation (permission restricted or database already exists): " + e.getMessage());
         }
     }
 

@@ -33,7 +33,31 @@ public final class AppConfig {
     }
 
     public static String getDbUrl() {
-        return get("db.url", "DB_URL");
+        // 1. Check custom DB_URL env var or property
+        String dbUrl = get("db.url", "DB_URL");
+        if (!dbUrl.isEmpty()) {
+            return dbUrl;
+        }
+
+        // 2. Check Railway's MYSQL_URL and convert it to JDBC format
+        String mysqlUrl = System.getenv("MYSQL_URL");
+        if (mysqlUrl != null && !mysqlUrl.isBlank()) {
+            if (mysqlUrl.startsWith("mysql://")) {
+                return "jdbc:mysql://" + mysqlUrl.substring(8);
+            }
+            return mysqlUrl.trim();
+        }
+
+        // 3. Construct JDBC URL from individual Railway variables
+        String host = System.getenv("MYSQLHOST");
+        String port = System.getenv("MYSQLPORT");
+        String database = System.getenv("MYSQLDATABASE");
+        if (host != null && !host.isBlank() && port != null && !port.isBlank() && database != null && !database.isBlank()) {
+            return "jdbc:mysql://" + host.trim() + ":" + port.trim() + "/" + database.trim()
+                    + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+        }
+
+        return "";
     }
 
     public static String getBaseDbUrl() {
@@ -46,11 +70,27 @@ public final class AppConfig {
     }
 
     public static String getDbUser() {
-        return get("db.user", "DB_USER");
+        String dbUser = get("db.user", "DB_USER");
+        if (!dbUser.isEmpty()) {
+            return dbUser;
+        }
+        String mysqlUser = System.getenv("MYSQLUSER");
+        if (mysqlUser != null && !mysqlUser.isBlank()) {
+            return mysqlUser.trim();
+        }
+        return "";
     }
 
     public static String getDbPassword() {
-        return get("db.password", "DB_PASSWORD");
+        String dbPassword = get("db.password", "DB_PASSWORD");
+        if (!dbPassword.isEmpty()) {
+            return dbPassword;
+        }
+        String mysqlPassword = System.getenv("MYSQLPASSWORD");
+        if (mysqlPassword != null && !mysqlPassword.isBlank()) {
+            return mysqlPassword.trim();
+        }
+        return "";
     }
 
     public static String getCloudinaryCloudName() {
