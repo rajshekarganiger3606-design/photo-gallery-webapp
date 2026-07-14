@@ -1,0 +1,142 @@
+<div th:replace="~{layout :: layout(~{::content})}">
+    <div th:fragment="content">
+        <div class="container my-5">
+            
+            <!-- Alert Banner -->
+            <div th:if="${param.error}" class="alert alert-danger alert-dismiss-delay" role="alert">
+                An error occurred while processing your request. Please try again.
+            </div>
+
+            <div class="row g-5">
+                <!-- Image Column -->
+                <div class="col-lg-7">
+                    <div class="card-glass p-3 overflow-hidden text-center" style="cursor: pointer;" th:onclick="openLightbox([[${photo.imageUrl}]], [[${photo.title}]])">
+                        <img th:src="${photo.imageUrl}" th:alt="${photo.title}" class="img-fluid rounded" style="max-height: 550px; object-fit: contain; width: 100%;">
+                        <div class="mt-2 text-muted small">🔍 Click image to enlarge</div>
+                    </div>
+                </div>
+
+                <!-- Info Column -->
+                <div class="col-lg-5">
+                    <div class="card-glass p-4 mb-4">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="badge-category" th:text="${photo.category != null ? photo.category.name : 'Uncategorized'}">Category</span>
+                            <span class="text-muted small" th:text="'Uploaded ' + ${#temporals.format(photo.uploadedAt, 'yyyy-MM-dd')}">Date</span>
+                        </div>
+                        
+                        <h1 class="mb-2" th:text="${photo.title}">Photo Title</h1>
+                        <p class="text-muted mb-4">
+                            By <a th:href="@{/photographer/{id}(id=${photo.uploader.id})}" style="color: var(--accent-color); font-weight: 500;" class="text-decoration-none" th:text="${photo.uploader.displayName}">Photographer</a>
+                        </p>
+                        
+                        <hr style="border-color: var(--border-color);" class="my-3">
+                        
+                        <p th:text="${photo.description != null && !photo.description.isEmpty() ? photo.description : 'No description provided.'}">Photo description goes here.</p>
+                        
+                        <hr style="border-color: var(--border-color);" class="my-3">
+
+                        <!-- Metrics Grid -->
+                        <div class="row text-center g-2 my-2">
+                            <div class="col-6">
+                                <div class="p-3 rounded" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color);">
+                                    <small class="text-muted d-block mb-1">Average Rating</small>
+                                    <span class="star-rating-static justify-content-center">
+                                        <span th:each="i : ${#numbers.sequence(1, 5)}" th:class="${i <= photo.averageRating} ? '' : 'star-empty'">★</span>
+                                    </span>
+                                    <strong class="d-block mt-1" th:text="${photo.averageRating} + ' / 5.0'">4.5 / 5.0</strong>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 rounded" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color);">
+                                    <small class="text-muted d-block mb-1">Total Likes</small>
+                                    <span style="font-size: 1.2rem; color: var(--heart-red);">❤️</span>
+                                    <strong class="d-block mt-1" th:text="${photo.totalLikes} + ' Likes'">12 Likes</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Secured User Actions -->
+                        <div class="d-flex align-items-center justify-content-between mt-4" sec:authorize="isAuthenticated()">
+                            <!-- Toggle Like -->
+                            <form th:action="@{/photos/{id}/like(id=${photo.id})}" method="post">
+                                <button type="submit" class="btn btn-secondary-custom d-flex align-items-center gap-2">
+                                    <span th:text="${hasLiked} ? '❤️ Liked' : '🖤 Like'">Like</span>
+                                </button>
+                            </form>
+
+                            <!-- Rate Form -->
+                            <form th:action="@{/photos/{id}/rate(id=${photo.id})}" method="post" class="d-flex align-items-center gap-2">
+                                <span class="text-muted small">My Rating:</span>
+                                <div class="star-rating-interactive">
+                                    <input type="radio" id="star5" name="score" value="5" th:checked="${userRating == 5}" onclick="this.form.submit()"><label for="star5">★</label>
+                                    <input type="radio" id="star4" name="score" value="4" th:checked="${userRating == 4}" onclick="this.form.submit()"><label for="star4">★</label>
+                                    <input type="radio" id="star3" name="score" value="3" th:checked="${userRating == 3}" onclick="this.form.submit()"><label for="star3">★</label>
+                                    <input type="radio" id="star2" name="score" value="2" th:checked="${userRating == 2}" onclick="this.form.submit()"><label for="star2">★</label>
+                                    <input type="radio" id="star1" name="score" value="1" th:checked="${userRating == 1}" onclick="this.form.submit()"><label for="star1">★</label>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="text-center text-muted small mt-3" sec:authorize="isAnonymous()">
+                            <a th:href="@{/login}" style="color: var(--accent-color);" class="text-decoration-none">Log in</a> to rate or like this photo.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comment Log -->
+            <div class="row mt-4">
+                <div class="col-lg-7">
+                    <div class="card-glass p-4">
+                        <h3 class="mb-4">Critiques & Comments (<span th:text="${#lists.size(comments)}">0</span>)</h3>
+
+                        <!-- Critique Submission -->
+                        <div sec:authorize="isAuthenticated()" class="mb-4">
+                            <form th:action="@{/comments/post/{photoId}(photoId=${photo.id})}" method="post">
+                                <div class="mb-3">
+                                    <label for="content" class="form-label form-label-custom">Submit Feedback</label>
+                                    <textarea id="content" name="content" class="form-control form-control-custom" rows="3" placeholder="Provide feedback on lighting, composition, colors, or suggest edits..." required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary-custom">✦ Submit Critique</button>
+                            </form>
+                        </div>
+                        <div class="alert alert-secondary text-center py-3 mb-4" sec:authorize="isAnonymous()">
+                            <a th:href="@{/login}" style="color: var(--accent-color);" class="text-decoration-none">Log in</a> to post comments or critiques.
+                        </div>
+
+                        <!-- Feedback List -->
+                        <div class="d-grid gap-3">
+                            <div th:each="comment : ${comments}" class="p-3 rounded border" style="background: rgba(255,255,255,0.01); border-color: var(--border-color) !important;">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <div>
+                                        <strong th:text="${comment.user.displayName}">Display name</strong>
+                                        <span class="badge bg-secondary ms-2" th:if="${comment.user.id == photo.uploader.id}">Creator</span>
+                                        <small class="text-muted ms-2" th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">Date</small>
+                                    </div>
+                                    
+                                    <!-- Delete Button -->
+                                    <form th:if="${currentUser != null && (currentUser.id == comment.user.id || currentUser.id == photo.uploader.id || #authorization.expression('hasRole(''ROLE_ADMIN'')'))}" 
+                                          th:action="@{/comments/delete/{commentId}(commentId=${comment.id})}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this comment?');">
+                                        <input type="hidden" name="photoId" th:value="${photo.id}">
+                                        <button type="submit" class="btn btn-link text-danger p-0 border-0 text-decoration-none small">🗑️ Delete</button>
+                                    </form>
+                                </div>
+                                <p class="mb-0 text-muted" th:text="${comment.content}">Content</p>
+                            </div>
+
+                            <div class="text-center py-4 text-muted" th:if="${#lists.isEmpty(comments)}">
+                                <span style="font-size: 2.2rem; display: block; margin-bottom: 10px;">💬</span>
+                                <p class="small mb-0">No critiques posted yet. Be the first to share your thoughts!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lightbox Modal -->
+        <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox()">
+            <button class="lightbox-close-btn" onclick="closeLightbox()">✕</button>
+            <img class="lightbox-content" id="lightboxImage" src="" alt="">
+        </div>
+    </div>
+</div>

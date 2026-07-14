@@ -1,0 +1,90 @@
+<div th:replace="~{layout :: layout(~{::content})}">
+    <div th:fragment="content">
+        <!-- Hero Section -->
+        <div class="container my-5 py-5 text-center">
+            <div class="row justify-content-center">
+                <div class="col-md-9 col-lg-8">
+                    <h1 class="display-3 mb-4" style="font-weight: 800;">Critique & Showcase Your <span style="background: linear-gradient(135deg, #c084fc 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Photography</span></h1>
+                    <p class="lead text-muted mb-5">Join the premium community of professional photographers and critics. Share your photos, receive constructive ratings and comments, and grow together.</p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a th:href="@{/gallery}" class="btn btn-primary-custom px-4 py-3">✦ Explore Gallery</a>
+                        <a th:href="@{/register}" sec:authorize="isAnonymous()" class="btn btn-secondary-custom px-4 py-3">Join Community</a>
+                        <a th:href="@{/dashboard/upload}" sec:authorize="isAuthenticated()" class="btn btn-secondary-custom px-4 py-3">Upload Photo</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Featured Section (Most Popular) -->
+        <div class="container my-5 py-4">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h2 class="mb-1">Most Popular Photo Submissions</h2>
+                    <p class="text-muted mb-0">The highest rated and most liked creations by our photographers.</p>
+                </div>
+                <a th:href="@{/gallery(sort='most-popular')}" class="text-decoration-none" style="color: var(--accent-color);">Browse All &rarr;</a>
+            </div>
+
+            <div class="text-center py-5 text-muted card-glass" th:if="${#lists.isEmpty(popularPhotos)}">
+                <span style="font-size: 3rem; display: block; margin-bottom: 10px;">📷</span>
+                <p class="mb-0">No photos uploaded yet.</p>
+            </div>
+
+            <div class="row g-4" th:if="${not #lists.isEmpty(popularPhotos)}">
+                <div class="col-md-4" th:each="photo : ${popularPhotos}">
+                    <div class="photo-card h-100">
+                        <img th:src="${photo.imageUrl}" th:alt="${photo.title}">
+                        <div class="photo-overlay">
+                            <span class="badge-category mb-2 d-inline-block" th:text="${photo.category != null ? photo.category.name : 'Uncategorized'}">Category</span>
+                            <h4 class="mb-1 text-white" th:text="${photo.title}">Photo Title</h4>
+                            <p class="small text-muted mb-3" th:text="'By ' + ${photo.uploader.displayName}">Photographer</p>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="star-rating-static">
+                                    <span th:each="i : ${#numbers.sequence(1, 5)}" th:class="${i <= photo.averageRating} ? '' : 'star-empty'">★</span>
+                                    <small class="text-white ms-1" th:text="${photo.averageRating}"></small>
+                                </span>
+                                <a th:href="@{/photo-details/{id}(id=${photo.id})}" class="btn btn-primary-custom btn-sm py-1 px-3" style="font-size: 0.8rem;">Review</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Latest Uploads Section -->
+        <div class="container my-5 py-4">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h2 class="mb-1">Latest Uploads</h2>
+                    <p class="text-muted mb-0">Fresh work submitted by the community.</p>
+                </div>
+                <a th:href="@{/gallery(sort='newest')}" class="text-decoration-none" style="color: var(--accent-color);">Browse All &rarr;</a>
+            </div>
+
+            <div class="text-center py-5 text-muted card-glass" th:if="${#lists.isEmpty(latestPhotos)}">
+                <span style="font-size: 3rem; display: block; margin-bottom: 10px;">📷</span>
+                <p class="mb-0">No photos uploaded yet.</p>
+            </div>
+
+            <div class="row g-4" th:if="${not #lists.isEmpty(latestPhotos)}">
+                <div class="col-md-4" th:each="photo : ${latestPhotos}">
+                    <div class="photo-card h-100">
+                        <img th:src="${photo.imageUrl}" th:alt="${photo.title}">
+                        <div class="photo-overlay">
+                            <span class="badge-category mb-2 d-inline-block" th:text="${photo.category != null ? photo.category.name : 'Uncategorized'}">Category</span>
+                            <h4 class="mb-1 text-white" th:text="${photo.title}">Photo Title</h4>
+                            <p class="small text-muted mb-3" th:text="'By ' + ${photo.uploader.displayName}">Photographer</p>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="star-rating-static">
+                                    <span th:each="i : ${#numbers.sequence(1, 5)}" th:class="${i <= photo.averageRating} ? '' : 'star-empty'">★</span>
+                                    <small class="text-white ms-1" th:text="${photo.averageRating}"></small>
+                                </span>
+                                <a th:href="@{/photo-details/{id}(id=${photo.id})}" class="btn btn-primary-custom btn-sm py-1 px-3" style="font-size: 0.8rem;">Review</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

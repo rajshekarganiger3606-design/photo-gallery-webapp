@@ -1,0 +1,66 @@
+<div th:replace="~{layout :: layout(~{::content})}">
+    <div th:fragment="content">
+        <div class="container my-5">
+            <h2 class="mb-4">Moderate Photos</h2>
+
+            <!-- Success Banner -->
+            <div th:if="${param.success == 'delete'}" class="alert alert-success alert-dismiss-delay" role="alert">
+                The photo has been permanently deleted from database records and disk storage!
+            </div>
+
+            <div class="card-glass p-4">
+                <div class="text-center py-5 text-muted" th:if="${#lists.isEmpty(photos)}">
+                    <span style="font-size: 3rem;">🖼️</span>
+                    <p class="mt-2">No photos uploaded to the gallery catalog yet.</p>
+                </div>
+
+                <div class="table-responsive" th:if="${not #lists.isEmpty(photos)}">
+                    <table class="table table-dark table-custom align-middle">
+                        <thead>
+                            <tr>
+                                <th>Preview</th>
+                                <th>Photo Details</th>
+                                <th>Uploader</th>
+                                <th>Stats</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="photo : ${photos}">
+                                <td>
+                                    <img th:src="${photo.imageUrl}" th:alt="${photo.title}" style="width: 80px; height: 60px; object-fit: cover; border-radius: 8px; cursor: pointer;" th:onclick="openLightbox([[${photo.imageUrl}]], [[${photo.title}]])">
+                                </td>
+                                <td>
+                                    <strong class="d-block" th:text="${photo.title}">Photo Title</strong>
+                                    <span class="badge bg-secondary mt-1" th:text="${photo.category != null ? photo.category.name : 'Uncategorized'}">Category</span>
+                                </td>
+                                <td>
+                                    <span class="d-block" th:text="${photo.uploader.displayName}">Jane Doe</span>
+                                    <small class="text-muted" th:text="${photo.uploader.email}">email</small>
+                                </td>
+                                <td>
+                                    <span class="d-block text-warning small">★ <span th:text="${photo.averageRating}">0.0</span></span>
+                                    <span class="d-block text-danger small">❤️ <span th:text="${photo.totalLikes}">0</span></span>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <a th:href="@{/photo-details/{id}(id=${photo.id})}" class="btn btn-outline-info btn-sm">View details</a>
+                                        <form th:action="@{/admin/photos/{id}/delete(id=${photo.id})}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this photo as an administrator? This action is permanent and deletes local disk files.');">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">🗑️ Delete</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lightbox Modal -->
+        <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox()">
+            <button class="lightbox-close-btn" onclick="closeLightbox()">✕</button>
+            <img class="lightbox-content" id="lightboxImage" src="" alt="">
+        </div>
+    </div>
+</div>

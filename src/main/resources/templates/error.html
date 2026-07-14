@@ -1,0 +1,16 @@
+<div th:replace="~{layout :: layout(~{::content})}">
+    <div th:fragment="content">
+        <div class="container my-5 py-5 text-center">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="card-glass p-5">
+                        <span style="font-size: 6rem; display: block; margin-bottom: 20px;">⚠️</span>
+                        <h1 class="mb-3" th:text="${errorStatus != null} ? 'Error ' + ${errorStatus} : 'Application Error'">Error</h1>
+                        <p class="text-muted mb-4" th:text="${errorMessage != null} ? ${errorMessage} : 'An unexpected error occurred. Please try again.'">Error description</p>
+                        <a th:href="@{/}" class="btn btn-primary-custom px-4 py-3">Return to Home</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

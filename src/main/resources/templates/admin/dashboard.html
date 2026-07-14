@@ -1,0 +1,131 @@
+<div th:replace="~{layout :: layout(~{::content})}">
+    <div th:fragment="content">
+        <div class="container my-5">
+            <!-- Admin Header -->
+            <div class="mb-5">
+                <h2>Administrator Control Center</h2>
+                <p class="text-muted">Monitor database statistics, moderate community content, and control account permissions.</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-widget-premium">
+                        <small class="text-muted text-uppercase tracking-wider">Total Registrations</small>
+                        <div class="stat-val-premium mt-2" th:text="${totalUsers}">0</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-widget-premium">
+                        <small class="text-muted text-uppercase tracking-wider">Total Submissions</small>
+                        <div class="stat-val-premium mt-2" th:text="${totalPhotos}">0</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-widget-premium">
+                        <small class="text-muted text-uppercase tracking-wider">Total Critiques</small>
+                        <div class="stat-val-premium mt-2 text-danger" th:text="${totalComments}">0</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-widget-premium">
+                        <small class="text-muted text-uppercase tracking-wider">Total Ratings</small>
+                        <div class="stat-val-premium mt-2 text-warning" th:text="${totalRatings}">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nav Shortcuts Grid -->
+            <div class="row g-4 mb-5 text-center">
+                <div class="col-6 col-md-3">
+                    <a th:href="@{/admin/users}" class="btn btn-secondary-custom w-100 py-3 d-block text-decoration-none">👥 Manage Users</a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a th:href="@{/admin/photos}" class="btn btn-secondary-custom w-100 py-3 d-block text-decoration-none">🖼️ Moderate Photos</a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a th:href="@{/admin/comments}" class="btn btn-secondary-custom w-100 py-3 d-block text-decoration-none">💬 Moderate Comments</a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a th:href="@{/admin/categories}" class="btn btn-secondary-custom w-100 py-3 d-block text-decoration-none">🏷️ Categories CRUD</a>
+                </div>
+            </div>
+
+            <!-- Leaderboards Row -->
+            <div class="row g-4">
+                <!-- Popular Photos Leaderboard -->
+                <div class="col-lg-6">
+                    <div class="card-glass p-4 h-100">
+                        <h4 class="mb-4">Top Rated Submissions</h4>
+                        
+                        <div class="text-center py-5 text-muted" th:if="${#lists.isEmpty(popularPhotos)}">
+                            <span style="font-size: 2rem;">🖼️</span>
+                            <p class="small mt-2">No photo records seeding statistics yet.</p>
+                        </div>
+
+                        <div class="table-responsive" th:if="${not #lists.isEmpty(popularPhotos)}">
+                            <table class="table table-dark table-custom align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Photo</th>
+                                        <th>Photographer</th>
+                                        <th>Score</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="photo : ${popularPhotos}">
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <img th:src="${photo.imageUrl}" th:alt="${photo.title}" style="width: 50px; height: 38px; object-fit: cover; border-radius: 4px;">
+                                                <span class="small fw-bold text-truncate" style="max-width: 150px;" th:text="${photo.title}">Title</span>
+                                            </div>
+                                        </td>
+                                        <td class="small text-muted" th:text="${photo.uploader.displayName}">Jane Doe</td>
+                                        <td>
+                                            <span class="text-warning font-semibold">★ <span th:text="${photo.averageRating}">0.0</span></span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Users List -->
+                <div class="col-lg-6">
+                    <div class="card-glass p-4 h-100">
+                        <h4 class="mb-4">Registered Accounts Summary</h4>
+                        
+                        <div class="text-center py-5 text-muted" th:if="${#lists.isEmpty(usersList)}">
+                            <span style="font-size: 2rem;">👤</span>
+                            <p class="small mt-2">No user accounts found.</p>
+                        </div>
+
+                        <div class="table-responsive" th:if="${not #lists.isEmpty(usersList)}">
+                            <table class="table table-dark table-custom align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="user : ${usersList}">
+                                        <td>
+                                            <strong class="small d-block" th:text="${user.displayName}">Name</strong>
+                                        </td>
+                                        <td class="small text-muted" th:text="${user.email}">Email</td>
+                                        <td>
+                                            <span class="badge" th:classappend="${user.enabled} ? 'bg-success' : 'bg-danger'" th:text="${user.enabled} ? 'Active' : 'Suspended'">Status</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

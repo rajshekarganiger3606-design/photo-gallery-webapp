@@ -1,0 +1,62 @@
+<div th:replace="~{layout :: layout(~{::content})}">
+    <div th:fragment="content">
+        <div class="container my-5">
+            <!-- Profile Info Card -->
+            <div class="card-glass p-5 mb-5">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <span style="font-size: 3rem; display: block; margin-bottom: 10px;">👤</span>
+                        <h2 class="mt-2" th:text="${photographer.displayName}">Jane Doe</h2>
+                        <p class="text-muted" th:text="${photographer.email}">jane@photoreview.com</p>
+                        <p class="mb-0" th:text="${photographer.bio != null && !photographer.bio.isEmpty() ? photographer.bio : 'This photographer has not written a bio yet.'}">Bio description.</p>
+                    </div>
+                    <div class="col-md-4 mt-4 mt-md-0">
+                        <div class="p-4 rounded text-center" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color);">
+                            <div class="row">
+                                <div class="col-4">
+                                    <h4 class="mb-1" th:text="${totalPhotos}">0</h4>
+                                    <small class="text-muted d-block" style="font-size: 0.75rem;">Photos</small>
+                                </div>
+                                <div class="col-4" style="border-left: 1px solid var(--border-color); border-right: 1px solid var(--border-color);">
+                                    <h4 class="mb-1" th:text="${totalLikes}">0</h4>
+                                    <small class="text-muted d-block" style="font-size: 0.75rem;">Likes</small>
+                                </div>
+                                <div class="col-4">
+                                    <h4 class="mb-1" th:text="${avgRating}">0.0</h4>
+                                    <small class="text-muted d-block" style="font-size: 0.75rem;">Rating</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portfolio Section -->
+            <h3 class="mb-4">Photographer's Portfolio</h3>
+            
+            <div class="text-center py-5 text-muted card-glass" th:if="${#lists.isEmpty(photos)}">
+                <span style="font-size: 3rem; display: block; margin-bottom: 10px;">📷</span>
+                <p class="mb-0">No photos uploaded by this photographer yet.</p>
+            </div>
+
+            <div class="row g-4" th:if="${not #lists.isEmpty(photos)}">
+                <div class="col-md-4" th:each="photo : ${photos}">
+                    <div class="photo-card">
+                        <img th:src="${photo.imageUrl}" th:alt="${photo.title}">
+                        <div class="photo-overlay">
+                            <span class="badge-category mb-2 d-inline-block" th:text="${photo.category != null ? photo.category.name : 'Uncategorized'}">Category</span>
+                            <h4 class="mb-1 text-white text-truncate" style="max-width: 90%;" th:text="${photo.title}">Photo Title</h4>
+                            <div class="d-flex align-items-center justify-content-between mt-2">
+                                <span class="star-rating-static">
+                                    <span th:each="i : ${#numbers.sequence(1, 5)}" th:class="${i <= photo.averageRating} ? '' : 'star-empty'">★</span>
+                                    <small class="text-white ms-1" th:text="${photo.averageRating}"></small>
+                                </span>
+                                <a th:href="@{/photo-details/{id}(id=${photo.id})}" class="btn btn-primary-custom btn-sm py-1 px-3" style="font-size: 0.8rem;">Review</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

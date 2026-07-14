@@ -1,0 +1,56 @@
+<div th:replace="~{layout :: layout(~{::content})}">
+    <div th:fragment="content">
+        <div class="container my-5">
+            <h2 class="mb-4">Manage User Accounts</h2>
+
+            <!-- Banners -->
+            <div th:if="${param.success == 'status'}" class="alert alert-success alert-dismiss-delay" role="alert">
+                User status has been successfully updated!
+            </div>
+            <div th:if="${param.success == 'delete'}" class="alert alert-success alert-dismiss-delay" role="alert">
+                User account has been permanently deleted from the system database.
+            </div>
+
+            <div class="card-glass p-4">
+                <div class="table-responsive">
+                    <table class="table table-dark table-custom align-middle">
+                        <thead>
+                            <tr>
+                                <th>Display Profile</th>
+                                <th>Email Address</th>
+                                <th>Account Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="user : ${users}">
+                                <td>
+                                    <strong class="d-block" th:text="${user.displayName}">Display Name</strong>
+                                    <span class="badge bg-secondary small mt-1" th:each="role : ${user.roles}" th:text="${role.name}">ROLE_USER</span>
+                                </td>
+                                <td th:text="${user.email}">user@example.com</td>
+                                <td>
+                                    <span class="badge" th:classappend="${user.enabled} ? 'bg-success' : 'bg-danger'" th:text="${user.enabled} ? 'Active' : 'Suspended'">Active</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <!-- Toggle Status Form -->
+                                        <form th:action="@{/admin/users/{id}/status(id=${user.id})}" method="post" style="display:inline;">
+                                            <input type="hidden" name="enabled" th:value="${!user.enabled}">
+                                            <button type="submit" class="btn btn-sm" th:classappend="${user.enabled} ? 'btn-outline-warning' : 'btn-outline-success'" th:text="${user.enabled} ? 'Suspend' : 'Activate'">Action</button>
+                                        </form>
+
+                                        <!-- Delete Form (Cannot delete self) -->
+                                        <form th:if="${#authentication.name != user.email}" th:action="@{/admin/users/{id}/delete(id=${user.id})}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to permanently delete this user? All their comments and uploads will also be purged.');">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">🗑️ Delete</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

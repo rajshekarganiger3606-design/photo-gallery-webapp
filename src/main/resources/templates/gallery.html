@@ -1,0 +1,102 @@
+<div th:replace="~{layout :: layout(~{::content})}">
+    <div th:fragment="content">
+        <div class="container my-5">
+            <!-- Search & Sort Controls -->
+            <div class="card-glass p-4 mb-4">
+                <form th:action="@{/gallery}" method="get" class="row g-3 align-items-center">
+                    <!-- Preserve Category Filters -->
+                    <input type="hidden" name="categoryId" th:value="${selectedCategory}" th:if="${selectedCategory != null}">
+                    
+                    <!-- Text Search -->
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: rgba(255,255,255,0.02); border-color: var(--border-color); color: var(--text-secondary);">🔍</span>
+                            <input type="text" name="search" th:value="${searchQuery}" class="form-control form-control-custom" placeholder="Search by title, category, or photographer...">
+                        </div>
+                    </div>
+
+                    <!-- Sort Settings -->
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center gap-2">
+                            <label for="sortSelect" class="text-nowrap text-muted small">Sort By:</label>
+                            <select id="sortSelect" name="sort" class="form-select form-control-custom" onchange="this.form.submit()">
+                                <option value="newest" th:selected="${selectedSort == 'newest'}">Newest Uploads</option>
+                                <option value="highest-rated" th:selected="${selectedSort == 'highest-rated'}">Highest Rated</option>
+                                <option value="most-popular" th:selected="${selectedSort == 'most-popular'}">Most Popular (Liked)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary-custom w-100">Search</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Category Pills -->
+            <div class="filter-pills-container">
+                <a th:href="@{/gallery(search=${searchQuery}, sort=${selectedSort})}" 
+                   class="btn btn-filter-pill" th:classappend="${selectedCategory == null} ? 'active' : ''">
+                   All Categories
+                </a>
+                <a th:each="cat : ${categories}" 
+                   th:href="@{/gallery(categoryId=${cat.id}, search=${searchQuery}, sort=${selectedSort})}" 
+                   class="btn btn-filter-pill" 
+                   th:classappend="${selectedCategory == cat.id} ? 'active' : ''" 
+                   th:text="${cat.name}">Category</a>
+            </div>
+
+            <!-- Empty Grid Feedback -->
+            <div class="text-center py-5 text-muted card-glass" th:if="${#lists.isEmpty(photos)}">
+                <span style="font-size: 4rem; display: block; margin-bottom: 10px;">🖼️</span>
+                <h4 class="mt-3">No photos found</h4>
+                <p class="text-muted">Try adjusting your filters or search keywords.</p>
+            </div>
+
+            <!-- Masonry Photo Grid -->
+            <div class="masonry-grid" th:if="${not #lists.isEmpty(photos)}">
+                <div class="masonry-item" th:each="photo : ${photos}">
+                    <div class="photo-card">
+                        <img th:src="${photo.imageUrl}" th:alt="${photo.title}">
+                        <div class="photo-overlay">
+                            <span class="badge-category mb-2 d-inline-block" th:text="${photo.category != null ? photo.category.name : 'Uncategorized'}">Category</span>
+                            <h4 class="mb-1 text-white text-truncate" style="max-width: 90%;" th:text="${photo.title}">Photo Title</h4>
+                            <p class="small text-muted mb-3" th:text="'By ' + ${photo.uploader.displayName}">Photographer</p>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="star-rating-static">
+                                    <span th:each="i : ${#numbers.sequence(1, 5)}" th:class="${i <= photo.averageRating} ? '' : 'star-empty'">★</span>
+                                    <small class="text-white ms-1" th:text="${photo.averageRating}"></small>
+                                </span>
+                                <a th:href="@{/photo-details/{id}(id=${photo.id})}" class="btn btn-primary-custom btn-sm py-1 px-3" style="font-size: 0.8rem;">Review</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gallery Pagination -->
+            <nav class="mt-5" aria-label="Gallery Pagination" th:if="${totalPages > 1}">
+                <ul class="pagination justify-content-center">
+                    <!-- Prev Button -->
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                        <a class="page-link" style="background: var(--card-bg); border-color: var(--border-color); color: var(--text-primary);" 
+                           th:href="@{/gallery(categoryId=${selectedCategory}, search=${searchQuery}, sort=${selectedSort}, page=${currentPage - 1})}">&laquo; Prev</a>
+                    </li>
+                    <!-- Page Indexes -->
+                    <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${currentPage == pageNum} ? 'active' : ''">
+                        <a class="page-link" 
+                           th:style="${currentPage == pageNum} ? 'background: var(--accent-color); border-color: var(--accent-color); color: white;' : 'background: var(--card-bg); border-color: var(--border-color); color: var(--text-secondary);'" 
+                           th:href="@{/gallery(categoryId=${selectedCategory}, search=${searchQuery}, sort=${selectedSort}, page=${pageNum})}" 
+                           th:text="${pageNum + 1}">1</a>
+                    </li>
+                    <!-- Next Button -->
+                    <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled' : ''">
+                        <a class="page-link" style="background: var(--card-bg); border-color: var(--border-color); color: var(--text-primary);" 
+                           th:href="@{/gallery(categoryId=${selectedCategory}, search=${searchQuery}, sort=${selectedSort}, page=${currentPage + 1})}">Next &raquo;</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>

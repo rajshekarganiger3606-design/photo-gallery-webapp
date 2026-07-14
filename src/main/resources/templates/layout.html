@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" th:fragment="layout(content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title != null} ? ${title} + ' - PhotoReview' : 'PhotoReview - Critique & Showcase'">PhotoReview</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts & Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Glassmorphic Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+        <div class="container">
+            <a class="navbar-brand navbar-brand-custom" th:href="@{/}">
+                📸 <span>PhotoReview</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation" style="border-color: var(--border-color);">
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" th:href="@{/}" th:classappend="${currentUri == '/' or currentUri == '/home' ? 'active' : ''}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" th:href="@{/gallery}" th:classappend="${currentUri == '/gallery' ? 'active' : ''}">Gallery</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" th:href="@{/about}" th:classappend="${currentUri == '/about' ? 'active' : ''}">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" th:href="@{/contact}" th:classappend="${currentUri == '/contact' ? 'active' : ''}">Contact</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center gap-3">
+                    <!-- Guest Links -->
+                    <span sec:authorize="isAnonymous()" class="d-flex gap-2">
+                        <a th:href="@{/login}" class="btn btn-secondary-custom btn-sm px-3">Log In</a>
+                        <a th:href="@{/register}" class="btn btn-primary-custom btn-sm px-3">Sign Up</a>
+                    </span>
+                    <!-- Logged In Links -->
+                    <span sec:authorize="isAuthenticated()" class="d-flex align-items-center gap-3">
+                        <a th:href="@{/dashboard}" class="btn btn-secondary-custom btn-sm px-3">Dashboard</a>
+                        <a th:href="@{/profile}" class="btn btn-secondary-custom btn-sm px-3">Profile</a>
+                        <a th:href="@{/logout}" class="btn btn-outline-danger btn-sm px-3">Log Out</a>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Injection -->
+    <main class="py-4">
+        <div th:replace="${content}"></div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-4 mt-5" style="border-top: 1px solid var(--border-color); background: rgba(12,11,15,0.4);">
+        <div class="container text-center text-muted">
+            <p class="mb-1">&copy; 2026 PhotoReview Platform. Built for Photographers & Critics.</p>
+            <small class="text-uppercase tracking-wider" style="font-size: 0.7rem;">Share constructive critiques &bull; Grow together</small>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<div th:replace="~{layout :: layout(~{::content})}">
+    <div th:fragment="content">
+        <div class="container my-5">
+            <h2 class="mb-4">Manage Photo Categories</h2>
+
+            <!-- Banners -->
+            <div th:if="${param.success == 'add'}" class="alert alert-success alert-dismiss-delay" role="alert">
+                New category has been added successfully!
+            </div>
+            <div th:if="${param.success == 'delete'}" class="alert alert-success alert-dismiss-delay" role="alert">
+                Category has been deleted successfully!
+            </div>
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismiss-delay" role="alert" th:text="${errorMessage}">
+                Error message
+            </div>
+
+            <div class="row g-4">
+                <!-- Add Category Column -->
+                <div class="col-lg-4">
+                    <div class="card-glass p-4">
+                        <h4 class="mb-4">Create Category</h4>
+                        
+                        <form th:action="@{/admin/categories/add}" th:object="${newCategory}" method="post">
+                            <div class="mb-4">
+                                <label for="name" class="form-label form-label-custom">Category Name</label>
+                                <input type="text" id="name" th:field="*{name}" class="form-control form-control-custom" placeholder="e.g. Portrait, Macro" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary-custom w-100 py-3">✦ Add Category</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Categories List Column -->
+                <div class="col-lg-8">
+                    <div class="card-glass p-4">
+                        <h4 class="mb-4">Active Categories</h4>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-dark table-custom align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Category Name</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="cat : ${categories}">
+                                        <td th:text="${cat.id}">1</td>
+                                        <td th:text="${cat.name}">Portrait</td>
+                                        <td>
+                                            <form th:action="@{/admin/categories/{id}/delete(id=${cat.id})}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this category? Associated photos will have their category field set to null.');">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm">🗑️ Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

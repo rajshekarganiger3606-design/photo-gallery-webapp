@@ -1,0 +1,73 @@
+<div th:replace="~{layout :: layout(~{::content})}">
+    <div th:fragment="content">
+        <div class="container my-5 py-4">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-7">
+                    <div class="card-glass p-5">
+                        
+                        <!-- Header Title -->
+                        <h2 class="mb-4" th:text="${photoId != null} ? 'Edit Photo Details' : 'Upload Photograph'">Upload Photo</h2>
+                        <p class="text-muted mb-5">Provide a descriptive title and select the appropriate category so users can critique your work.</p>
+
+                        <!-- Error Message Banner -->
+                        <div th:if="${errorMessage}" class="alert alert-danger alert-dismiss-delay" role="alert" th:text="${errorMessage}">
+                            Error message
+                        </div>
+
+                        <!-- Form -->
+                        <form th:action="${photoId != null} ? @{/dashboard/edit/{id}(id=${photoId})} : @{/dashboard/upload}" 
+                              th:object="${photoDto}" method="post" enctype="multipart/form-data">
+                            
+                            <!-- Title -->
+                            <div class="mb-4">
+                                <label for="title" class="form-label form-label-custom">Photo Title</label>
+                                <input type="text" id="title" th:field="*{title}" class="form-control form-control-custom" th:errorclass="is-invalid" placeholder="e.g. Skyline at Dawn" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">
+                                    Title error
+                                </div>
+                            </div>
+
+                            <!-- Category -->
+                            <div class="mb-4">
+                                <label for="categoryId" class="form-label form-label-custom">Portfolio Category</label>
+                                <select id="categoryId" th:field="*{categoryId}" class="form-select form-control-custom" th:errorclass="is-invalid" required>
+                                    <option value="" disabled selected>-- Choose Category --</option>
+                                    <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}">Category</option>
+                                </select>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}">
+                                    Category selection error
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="mb-4">
+                                <label for="description" class="form-label form-label-custom">Description (Camera settings, story behind the capture, etc.)</label>
+                                <textarea id="description" th:field="*{description}" class="form-control form-control-custom" rows="4" placeholder="Detail the shutter speed, lens length, lighting setup..."></textarea>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('description')}" th:errors="*{description}">
+                                    Description error
+                                </div>
+                            </div>
+
+                            <!-- File Select -->
+                            <div class="mb-5">
+                                <label for="file" class="form-label form-label-custom">Select Image File</label>
+                                <input type="file" id="file" th:field="*{file}" class="form-control form-control-custom" th:errorclass="is-invalid" accept="image/*" th:required="${photoId == null}">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('file')}" th:errors="*{file}">
+                                    File upload error
+                                </div>
+                                <small class="text-muted d-block mt-2" th:if="${photoId != null}">Leave empty if you do not want to replace the current image file.</small>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-flex gap-3">
+                                <button type="submit" class="btn btn-primary-custom w-100 py-3">✦ Save Photo</button>
+                                <a th:href="@{/dashboard/home}" class="btn btn-secondary-custom w-100 py-3 text-center">Cancel</a>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
